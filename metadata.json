@@ -1,0 +1,9 @@
+{
+    "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+    "type": "QuickStart",
+    "itemDisplayName": "OWASP ZAP Baseline Run in Azure",
+    "description": "This template initialises a single container instance running the OWASP ZAP docker image, runs a baseline scan, and pushes the results to Azure Blob Storage",
+    "summary": "Perform a baseline run of the OWASP Zed Attack Proxy using Azure resources",
+    "githubUsername": "nathankitchen",
+    "dateUpdated": "2019-08-05"
+  }
