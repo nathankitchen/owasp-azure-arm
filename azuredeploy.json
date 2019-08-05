@@ -44,7 +44,7 @@
         "cmdZapStart": "zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.key=abcd -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true",
         "cmdDirMakeOutput": "mkdir output",
         "cmdDirSymlinkWrk": "ln -s output wrk",
-        "cmdZapScan": "[concat('/zap/zap-baseline.py -t ', parameters('target'), ' -d -m 1 -x ', parameters('reportName'))]",
+        "cmdZapScan": "[concat('/zap/zap-baseline.py -t ', parameters('target'), ' -d -m ', parameters('spiderTime'), ' -x ', parameters('reportName'))]",
         "cmdWgetPutReport": "[concat('wget --method=PUT --header=\"x-ms-blob-type: BlockBlob\" --body-file=output/', parameters('reportName'), ' \"https://', variables('storageAccountName'),'.blob.core.windows.net/', parameters('blobContainerName'), '/', parameters('reportName'), '?')]",
         "accountSasProperties": {
             "signedServices": "b",

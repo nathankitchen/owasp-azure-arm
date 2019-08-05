@@ -1,5 +1,11 @@
 # OWASP ZAP Baseline Test via Azure
-Better writeup coming soon...
+An Azure ARM template designed to enable continuous security workflows, such as running baseline security tests against a web-based service as part of a release process. The template:
+
+   * Creates a storage account and blob container
+   * Provisions the [OWASP Zed Attack Proxy](https://www.owasp.org/index.php/OWASP_Zed_Attack_Proxy_Project) docker image to an Azure Container Instance
+   * Runs a baseline set of tests and outputs them to the blob store
+
+To meet more specific requirements please fork and amend the template. If you enhance the functionality and think more people might benefit then I'd be more than happy to deal with pull requests.
 
 <a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fnathankitchen%2Fowasp-azure-arm%2Fmaster%2Fazuredeploy.json" target="_blank">
     <img src="https://azuredeploy.net/deploybutton.png"/>
@@ -7,6 +13,19 @@ Better writeup coming soon...
 <a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2Fnathankitchen%2Fowasp-azure-arm%2Fmaster%2Fazuredeploy.json" target="_blank">
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
+
+## Usage
+Deploy the ARM template to your Azure subscription, specifying the following:
+
+   * **Resource Group** - All resources get deployed to the same resource group, and to its location. *NB:* Make sure you deploy to one that supports [Azure Container Instances](https://azure.microsoft.com/en-gb/services/container-instances/) (check [here](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=container-instances)), or the template will fail!*
+
+   * **Blob Container Name** - The ARM template will automatically provision an [Azure Storage account](https://azure.microsoft.com/en-gb/services/storage/) with a [Blob Container](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-introduction) where the results of the ZAP run will be saved, in XML form. Defaults to `reports`.
+
+   * **Target** - The name of the web resource to scan. Must begin with http/https.
+
+   * **Spider Time** - How long (in minutes) ZAP should spend spidering the target for additional content pages. ZAP will only spider links to the same domain. Defaults to `1`. *(Possible bug that this is not being respected, seems to scan for way longer than this limit)*
+
+   * **Report name** - The name of the output file. This will be an XML document containing the output of the ZAP baseline run. You can transform this to be compatible with Azure DevOps as part of a pipeline using [this XSLT file](https://dev.azure.com/francislacroix/_git/CodeShare?path=%2FOWASPBlog%2FOWASPToNUnit3.xslt&version=GBmaster).
 
 ## Credit
 Based on the work of **Francis Lacroix** over at Microsoft's [Premier Developer Blog](https://devblogs.microsoft.com/premier-developer/azure-devops-pipelines-leveraging-owasp-zap-in-the-release-pipeline/), ported to an ARM template.
