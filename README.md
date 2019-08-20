@@ -14,6 +14,13 @@ To meet more specific requirements please fork and amend the template. If you en
     <img src="http://armviz.io/visualizebutton.png"/>
 </a>
 
+## About
+For more information on how this template works and its development, see my blog posts:
+
+   * [Continuous Security with OWASP ZAP and Azure DevOps](https://www.nathankitchen.com/owasp-zap-baseline-test-in-azure-devops/)
+
+...more coming soon
+
 ## Usage
 Deploy the ARM template to your Azure subscription, specifying the following:
 
