@@ -2,8 +2,17 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-      "fileShareName": {
-        "value": "fs"
+      "blobContainerName": {
+        "value": "reports"
+      },
+      "target": {
+        "value": ""
+      },
+      "spiderTime": {
+        "value": 1
+      },
+      "reportName": {
+        "value": "owasp-report.xml"
       }
     }
   }
