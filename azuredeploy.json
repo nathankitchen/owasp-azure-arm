@@ -2,13 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "blobContainerName": {
-            "type": "string",
-            "defaultValue": "reports",
-            "metadata": {
-                "description": "Name of the blob container"
-            }
-        },
         "target": {
             "type": "string",
             "defaultValue": "",
@@ -24,16 +17,11 @@
             "metadata": {
                 "description": "How long to spend spidering the site, in minutes"
             }
-        },
-        "reportName": {
-            "type": "string",
-            "defaultValue": "owasp-report.xml",
-            "metadata": {
-                "description": "The name of the output XML file"
-            }
         }
     },
     "variables": {
+        "reportName": "owasp-report.xml",
+        "blobContainerName": "reports",
         "image": "owasp/zap2docker-stable",
         "storageAccountName": "[uniquestring(resourceGroup().id)]",
         "cpuCores": "1.0",
@@ -44,8 +32,8 @@
         "cmdZapStart": "zap.sh -daemon -host 0.0.0.0 -port 8080 -config api.key=abcd -config api.addrs.addr.name=.* -config api.addrs.addr.regex=true",
         "cmdDirMakeOutput": "mkdir output",
         "cmdDirSymlinkWrk": "ln -s output wrk",
-        "cmdZapScan": "[concat('/zap/zap-baseline.py -t ', parameters('target'), ' -d -m ', parameters('spiderTime'), ' -x ', parameters('reportName'))]",
-        "cmdWgetPutReport": "[concat('wget --method=PUT --header=\"x-ms-blob-type: BlockBlob\" --body-file=output/', parameters('reportName'), ' \"https://', variables('storageAccountName'),'.blob.core.windows.net/', parameters('blobContainerName'), '/', parameters('reportName'), '?')]",
+        "cmdZapScan": "[concat('/zap/zap-baseline.py -t ', parameters('target'), ' -d -m ', parameters('spiderTime'), ' -x ', variables('reportName'))]",
+        "cmdWgetPutReport": "[concat('wget --method=PUT --header=\"x-ms-blob-type: BlockBlob\" --body-file=output/', variables('reportName'), ' \"https://', variables('storageAccountName'),'.blob.core.windows.net/', variables('blobContainerName'), '/', variables('reportName'), '?')]",
         "accountSasProperties": {
             "signedServices": "b",
             "signedPermission": "rw",
@@ -71,7 +59,7 @@
                 {
                     "type": "blobServices/containers",
                     "apiVersion": "2018-03-01-preview",
-                    "name": "[concat('default/', parameters('blobContainerName'))]",
+                    "name": "[concat('default/', variables('blobContainerName'))]",
                     "dependsOn": [
                         "[variables('storageAccountName')]"
                     ],
@@ -143,11 +131,11 @@
         },
         "reportBlobContainer": {
             "type": "string",
-            "value": "[parameters('blobContainerName')]"
+            "value": "[variables('blobContainerName')]"
         },
         "reportFilename": {
             "type": "string",
-            "value": "[parameters('reportName')]"
+            "value": "[variables('reportName')]"
         },
         "reportSasToken": {
             "type": "string",
