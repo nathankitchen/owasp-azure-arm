@@ -48,7 +48,7 @@
         "cmdWgetPutReport": "[concat('wget --method=PUT --header=\"x-ms-blob-type: BlockBlob\" --body-file=output/', parameters('reportName'), ' \"https://', variables('storageAccountName'),'.blob.core.windows.net/', parameters('blobContainerName'), '/', parameters('reportName'), '?')]",
         "accountSasProperties": {
             "signedServices": "b",
-            "signedPermission": "w",
+            "signedPermission": "rw",
             "signedProtocol": "https",
             "signedStart": "2019-01-01T11:11:11Z",
             "signedExpiry": "2029-01-01T11:11:11Z",
@@ -135,5 +135,23 @@
                 "osType": "Linux"
             }
         }
-    ]
+    ],
+    "outputs": {
+        "reportStorageAccount": {
+          "type": "string",
+          "value": "[variables('storageAccountName')]"
+        },
+        "reportBlobContainer": {
+            "type": "string",
+            "value": "[parameters('blobContainerName')]"
+        },
+        "reportFilename": {
+            "type": "string",
+            "value": "[parameters('reportName')]"
+        },
+        "reportSasToken": {
+            "type": "string",
+            "value": "[listAccountSas(variables('storageAccountName'), '2018-02-01', variables('accountSasProperties')).accountSasToken]"
+        }
+    }
 }
