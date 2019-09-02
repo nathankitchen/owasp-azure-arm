@@ -1,0 +1,215 @@
+{
+    "tasks": [
+        {
+            "environment": {},
+            "displayName": "Deploy OWASP ZAP Instance",
+            "alwaysRun": false,
+            "continueOnError": false,
+            "condition": "succeeded()",
+            "enabled": true,
+            "timeoutInMinutes": 0,
+            "inputs": {
+                "ConnectedServiceName": "$(subscription)",
+                "action": "Create Or Update Resource Group",
+                "resourceGroupName": "$(resourceGroup)",
+                "location": "$(location)",
+                "templateLocation": "URL of the file",
+                "csmFileLink": "https://raw.githubusercontent.com/nathankitchen/owasp-azure-arm/outputs/azuredeploy.json",
+                "csmParametersFileLink": "https://raw.githubusercontent.com/nathankitchen/owasp-azure-arm/outputs/azuredeploy.parameters.json",
+                "csmFile": "",
+                "csmParametersFile": "",
+                "overrideParameters": "-target $(target)",
+                "deploymentMode": "Incremental",
+                "enableDeploymentPrerequisites": "None",
+                "deploymentGroupEndpoint": "",
+                "project": "",
+                "deploymentGroupName": "",
+                "copyAzureVMTags": "true",
+                "runAgentServiceAsUser": "false",
+                "userName": "",
+                "password": "",
+                "outputVariable": "",
+                "deploymentName": "",
+                "deploymentOutputs": "owaspResult",
+                "addSpnToEnvironment": "false"
+            },
+            "task": {
+                "id": "94a74903-f93f-4075-884f-dc11f34058b4",
+                "versionSpec": "2.*",
+                "definitionType": "task"
+            }
+        },
+        {
+            "environment": {},
+            "displayName": "Download Report",
+            "alwaysRun": false,
+            "continueOnError": false,
+            "condition": "succeeded()",
+            "enabled": true,
+            "timeoutInMinutes": 0,
+            "inputs": {
+                "ConnectedServiceNameSelector": "ConnectedServiceNameARM",
+                "ConnectedServiceName": "",
+                "ConnectedServiceNameARM": "$(subscription)",
+                "ScriptType": "InlineScript",
+                "ScriptPath": "",
+                "Inline": "$owasp = ConvertFrom-Json '$(owaspResult)'\n\n$context = New-AzureStorageContext $owasp.reportStorageAccount.value -SasToken $owasp.reportSasToken.value\n\nGet-AzureStorageBlobContent -Container $owasp.reportBlobContainer.value -Blob $owasp.reportFilename.value -Destination \"$(System.DefaultWorkingDirectory)\\owasp.xml\" -Context $context -Force\n\n$XslPath = \"https://raw.githubusercontent.com/nathankitchen/owasp-azure-arm/outputs/owasp-nunit3.xslt\"\n$XmlInputPath = \"$(System.DefaultWorkingDirectory)\\owasp.xml\"\n$XmlOutputPath = \"$(System.DefaultWorkingDirectory)\\owasp.testresults.xml\"\n$XslTransform = New-Object System.Xml.Xsl.XslCompiledTransform\n$XslTransform.Load($XslPath)\n$XslTransform.Transform($XmlInputPath, $XmlOutputPath)",
+                "ScriptArguments": "",
+                "errorActionPreference": "stop",
+                "FailOnStandardError": "false",
+                "TargetAzurePs": "LatestVersion",
+                "CustomTargetAzurePs": ""
+            },
+            "task": {
+                "id": "72a1931b-effb-4d2e-8fd8-f8472a07cb62",
+                "versionSpec": "3.*",
+                "definitionType": "task"
+            }
+        },
+        {
+            "environment": {},
+            "displayName": "Publish Test Results",
+            "alwaysRun": false,
+            "continueOnError": false,
+            "condition": "succeeded()",
+            "enabled": true,
+            "timeoutInMinutes": 0,
+            "inputs": {
+                "testRunner": "NUnit",
+                "testResultsFiles": "**/*.testresults.xml",
+                "searchFolder": "$(System.DefaultWorkingDirectory)",
+                "mergeTestResults": "false",
+                "failTaskOnFailedTests": "false",
+                "testRunTitle": "OWASP Baseline ZAP for $(target)",
+                "platform": "",
+                "configuration": "",
+                "publishRunAttachments": "true"
+            },
+            "task": {
+                "id": "0b0f01ed-7dde-43ff-9cbb-e48954daf9b1",
+                "versionSpec": "2.*",
+                "definitionType": "task"
+            }
+        },
+        {
+            "environment": {},
+            "displayName": "Delete Environment",
+            "alwaysRun": false,
+            "continueOnError": true,
+            "condition": "always()",
+            "enabled": true,
+            "timeoutInMinutes": 0,
+            "inputs": {
+                "ConnectedServiceNameSelector": "ConnectedServiceNameARM",
+                "ConnectedServiceName": "",
+                "ConnectedServiceNameARM": "$(subscription)",
+                "ScriptType": "InlineScript",
+                "ScriptPath": "",
+                "Inline": "# You can write your azure powershell scripts inline here. \n# You can also pass predefined and custom variables to this script using arguments\n\nRemove-AzureRmResourceGroup -Name $(resourceGroup) -Force",
+                "ScriptArguments": "",
+                "errorActionPreference": "stop",
+                "FailOnStandardError": "false",
+                "TargetAzurePs": "LatestVersion",
+                "CustomTargetAzurePs": ""
+            },
+            "task": {
+                "id": "72a1931b-effb-4d2e-8fd8-f8472a07cb62",
+                "versionSpec": "3.*",
+                "definitionType": "task"
+            }
+        }
+    ],
+    "runsOn": [
+        "Agent",
+        "DeploymentGroup"
+    ],
+    "revision": 3,
+    "createdBy": {
+        "displayName": "Nathan Kitchen",
+        "id": "176a6a0e-3e0a-4f38-8396-ec1dff25ee73",
+        "uniqueName": "nathan.kitchen@trustmarque.com"
+    },
+    "createdOn": "2019-08-30T07:57:45.697Z",
+    "modifiedBy": {
+        "displayName": "Nathan Kitchen",
+        "id": "176a6a0e-3e0a-4f38-8396-ec1dff25ee73",
+        "uniqueName": "nathan.kitchen@trustmarque.com"
+    },
+    "modifiedOn": "2019-09-02T08:40:16.443Z",
+    "comment": "",
+    "id": "d96f760a-0dc8-41aa-8678-b24af350b966",
+    "name": "OWASP Baseline Scan",
+    "version": {
+        "major": 1,
+        "minor": 0,
+        "patch": 0,
+        "isTest": false
+    },
+    "iconUrl": "https://cdn.vsassets.io/v/M156_20190825.5/_content/icon-meta-task.png",
+    "friendlyName": "OWASP Baseline Scan",
+    "description": "Deploys a container instance of the OWASP Zed Attack Proxy, runs a baseline scan against the target web address, publishes the test results and removes the instance and environment.",
+    "category": "Test",
+    "definitionType": "metaTask",
+    "author": "Nathan Kitchen",
+    "demands": [],
+    "groups": [],
+    "inputs": [
+        {
+            "aliases": [],
+            "options": {},
+            "properties": {
+                "EditableOptions": "True"
+            },
+            "name": "location",
+            "label": "location",
+            "defaultValue": "",
+            "required": true,
+            "type": "string",
+            "helpMarkDown": "Location for deploying the resource group. If the resource group already exists in the subscription, then this value will be ignored.",
+            "groupName": ""
+        },
+        {
+            "aliases": [],
+            "options": {},
+            "properties": {},
+            "name": "resourceGroup",
+            "label": "resourceGroup",
+            "defaultValue": "",
+            "required": true,
+            "type": "string",
+            "helpMarkDown": "The name of the resource group where the test will be executed.",
+            "groupName": ""
+        },
+        {
+            "aliases": [],
+            "options": {},
+            "properties": {},
+            "name": "subscription",
+            "label": "subscription",
+            "defaultValue": "",
+            "required": true,
+            "type": "connectedService:AzureRM",
+            "helpMarkDown": "Azure Resource Manager subscription to configure before running PowerShell.",
+            "groupName": ""
+        },
+        {
+            "aliases": [],
+            "options": {},
+            "properties": {},
+            "name": "target",
+            "label": "target",
+            "defaultValue": "",
+            "required": true,
+            "type": "string",
+            "helpMarkDown": "The URL of the target site to test.",
+            "groupName": ""
+        }
+    ],
+    "satisfies": [],
+    "sourceDefinitions": [],
+    "dataSourceBindings": [],
+    "instanceNameFormat": "Task group: OWASP Baseline Scan $(location)",
+    "preJobExecution": {},
+    "execution": {},
+    "postJobExecution": {}
+}

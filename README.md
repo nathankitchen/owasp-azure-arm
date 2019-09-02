@@ -17,11 +17,16 @@ To meet more specific requirements please fork and amend the template. If you en
 ## About
 For more information on how this template works and its development, see my blog posts:
 
-   * [Continuous Security with OWASP ZAP and Azure DevOps](https://www.nathankitchen.com/owasp-zap-baseline-test-in-azure-devops/)
-
-...more coming soon
+   * [Continuous Security with OWASP ZAP and Azure ARM (part 1)](https://www.nathankitchen.com/owasp-zap-baseline-test-in-azure-devops/)
+   * [Continuous Security with OWASP ZAP and Azure DevOps (part 2)](https://www.nathankitchen.com/owasp-zap-baseline-test-in-azure-devops-2/)
 
 ## Usage
+### Azure DevOps
+If you're using Azure DevOps, you can import a *Task Group* defining all the steps required to execute the ZAP run and publish the results. Find `az-devops-task-group.json` in the repository.
+
+Note that this definition downloads the latest version of the ARM template, parameters, and XSLT file over the public internet. For a more stable solution, I recommend forking the repo and creating a simple build pipeline that publishes an artifact containing the relevant files.
+
+### Any other scenario
 Deploy the ARM template to your Azure subscription, specifying the following:
 
    * **Resource Group** - All resources get deployed to the same resource group, and to its location. *NB:* Make sure you deploy to one that supports [Azure Container Instances](https://azure.microsoft.com/en-gb/services/container-instances/) (check [here](https://azure.microsoft.com/en-us/global-infrastructure/services/?products=container-instances)), or the template will fail!*
@@ -37,7 +42,7 @@ Deploy the ARM template to your Azure subscription, specifying the following:
 ## Credit
 Based on the work of **Francis Lacroix** over at Microsoft's [Premier Developer Blog](https://devblogs.microsoft.com/premier-developer/azure-devops-pipelines-leveraging-owasp-zap-in-the-release-pipeline/), ported to an ARM template.
 
-Template created by [Nathan Kitchen](https://www.twitter.com/nathankitchen). I'm a Cloud Architect and lead delivery of our Digital Platform at [Trustmarque](https://www.trustmarque.com/).
+Template and task group created by [Nathan Kitchen](https://www.twitter.com/nathankitchen). I'm a Cloud Architect and lead delivery of our Digital Platform at [Trustmarque](https://www.trustmarque.com/).
 
 ## License
 The MIT License (MIT)
